@@ -2,7 +2,9 @@ import Ship from "./ship.js";
 
 describe("Ship class", () => {
   test("throws error for invalid ship type", () => {
-    expect(() => new Ship("canoe")).toThrow("Invalid shipType given in Ship object constructor");
+    expect(() => new Ship("canoe")).toThrow(
+      "Invalid shipType given in Ship object constructor",
+    );
   });
 
   test("creates each valid ship type with correct size and initial hits", () => {
@@ -27,7 +29,9 @@ describe("Ship class", () => {
     ship.hit();
     ship.hit();
     expect(ship.isSunk()).toBe(true);
-    expect(() => ship.hit()).toThrow("Hit method being called on ship that is already sunk");
+    expect(() => ship.hit()).toThrow(
+      "Hit method being called on ship that is already sunk",
+    );
   });
 
   test("correctly increments hit count", () => {
