@@ -2,13 +2,44 @@ import Ship from "./ship.js";
 
 export default class Gameboard {
   constructor() {
-    this.board = Array.from({ length: 10 }, () => new Array(10).fill(null));
+    this.board = Array.from({ length: 10 }, () =>
+      Array.from({ length: 10 }, () => ({
+        ship: null,
+        isAttacked: false
+      }))
+    );
+  }
+
+  receiveAttack(position) {
+    // Validate input position
+    if (!Gameboard.isValidPosition(position)) {
+      throw new Error("Invalid position given to receiveAttack function");
+    }
+
+    const [x, y] = position;
+    const cell = this.board[y][x];
+
+    // Validate that square has not already been attacked
+    if (cell.isAttacked) {
+      throw new Error("Position given to receiveAttack function has already been attacked");
+    }
+
+    // Change isAttacked status to true
+    cell.isAttacked = true;
+
+    if (cell.ship) {
+      cell.ship.hit()
+      return "hit";
+    } else {
+      return "miss";
+    }
   }
 
   placeShip(type, positions) {
     // Validate ship types
-    if (!(type in Ship.shipTypes))
+    if (!(type in Ship.shipTypes)) {
       throw new Error("Invalid ship type given as input to placeShip");
+    }
 
     // Validate implied ship size by positions array with ship type's expected size
     const expectedSize = Ship.shipTypes[type].size;
@@ -16,22 +47,20 @@ export default class Gameboard {
       throw new Error("Type and positions are mismatched in placeShip input");
     }
 
-    // Validate positions in positions array are contigous and aligned
+    // Validate positions in positions array are contiguous and aligned
     if (!Gameboard.arePositionsContiguous(positions)) {
-      throw new Error("Ship positions must be contiguous and aligned");
+      throw new Error("Ship positions are not contiguous and aligned in placeShip input");
     }
 
     for (let pos of positions) {
       // Validate positions input array
       if (!Gameboard.isValidPosition(pos)) {
-        throw new Error("Invalid positions array given to placeShip function");
+        throw new Error("Invalid positions in positions array given to placeShip function");
       }
 
-      // Ensure positions are not already occupied
+      // Ensure cells are not occupied
       if (this.isCellOccupied(pos)) {
-        throw new Error(
-          "Positions input to placeShip function are already occupied",
-        );
+        throw new Error("Occupied position in positions array given to placeShip function");
       }
     }
 
@@ -40,8 +69,15 @@ export default class Gameboard {
 
     // Add ship to gameboard
     for (let pos of positions) {
-      this.board[pos[1]][pos[0]] = ship;
+      const [x, y] = pos;
+      this.board[y][x].ship = ship;
     }
+  }
+
+  isCellOccupied(position) {
+    const [x, y] = position;
+    const cell = this.board[y][x];
+    return cell.ship !== null;
   }
 
   static arePositionsContiguous(positions) {
@@ -60,10 +96,6 @@ export default class Gameboard {
     }
 
     return true;
-  }
-
-  isCellOccupied([x, y]) {
-    return this.board[y][x] !== null;
   }
 
   static isValidIndex(n) {
