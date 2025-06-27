@@ -48,7 +48,10 @@ describe("Gameboard.getBoardState", () => {
   });
 
   test("reflects a hit attack in board state", () => {
-    board.placeShip("destroyer", [[2, 2], [2, 3]]);
+    board.placeShip("destroyer", [
+      [2, 2],
+      [2, 3],
+    ]);
     board.receiveAttack([2, 2]);
     const state = board.getBoardState();
     expect(state[2][2]).toEqual({
@@ -59,7 +62,10 @@ describe("Gameboard.getBoardState", () => {
   });
 
   test("reflects an unattacked ship cell in board state", () => {
-    board.placeShip("destroyer", [[4, 4], [4, 5]]);
+    board.placeShip("destroyer", [
+      [4, 4],
+      [4, 5],
+    ]);
     const state = board.getBoardState();
     expect(state[4][4]).toEqual({
       hasShip: true,
@@ -68,7 +74,6 @@ describe("Gameboard.getBoardState", () => {
     });
   });
 });
-
 
 describe("Gameboard.allShipsSunk", () => {
   let board;
@@ -82,27 +87,39 @@ describe("Gameboard.allShipsSunk", () => {
   });
 
   test("returns false when at least one ship is not sunk", () => {
-    board.placeShip("destroyer", [[0, 0], [0, 1]]);
+    board.placeShip("destroyer", [
+      [0, 0],
+      [0, 1],
+    ]);
     expect(board.allShipsSunk()).toBe(false);
   });
 
   test("returns true when all ships are sunk", () => {
-    board.placeShip("destroyer", [[0, 0], [0, 1]]);
+    board.placeShip("destroyer", [
+      [0, 0],
+      [0, 1],
+    ]);
     board.receiveAttack([0, 0]);
     board.receiveAttack([0, 1]);
     expect(board.allShipsSunk()).toBe(true);
   });
 
   test("returns false when some ships are sunk but others are not", () => {
-    board.placeShip("destroyer", [[0, 0], [0, 1]]);
-    board.placeShip("submarine", [[2, 2], [2, 3], [2, 4]]);
+    board.placeShip("destroyer", [
+      [0, 0],
+      [0, 1],
+    ]);
+    board.placeShip("submarine", [
+      [2, 2],
+      [2, 3],
+      [2, 4],
+    ]);
     board.receiveAttack([0, 0]);
     board.receiveAttack([0, 1]);
     board.receiveAttack([2, 2]);
     expect(board.allShipsSunk()).toBe(false);
   });
 });
-
 
 describe("Gameboard.receiveAttack", () => {
   let board;
