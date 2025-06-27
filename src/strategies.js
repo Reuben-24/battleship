@@ -1,15 +1,31 @@
-import Ship from "./ship.js"
-export { computerStrategy, humanStrategy }
+import Ship from "./ship.js";
+import Gameboard from "./gameboard.js";
+export { computerStrategy, humanStrategy };
 
 const humanStrategy = {
-  placeShips(playerGameboard) {
+  placeShips(playerGameboard, selectedPositionsMap) {
+    // Example input: { destroyer: [[0,0],[0,1]], carrier: [[2,2],[2,3],[2,4],[2,5],[2,6]], ... }
 
+    validateGameboard(playerGameboard);
+    validateHumanShipPlacements(selectedPositionsMap);
+
+    for (const [type, positions] of Object.entries(selectedPositionsMap)) {
+      playerGameboard.placeShip(type, positions);
+    }
   },
 
-  takeTurn(gameboard, opponentBoard) {
+  takeTurn(opponentGameboard, selectedPosition) {
+    validateGameboard(opponentGameboard);
 
+    // Validate selected position
+    if (!Gameboard.isValidPosition(selectedPosition)) {
+      throw new Error("Invalid selected position");
+    }
+
+    // Attack selected position
+    return opponentGameboard.receiveAttack(selectedPosition);
   },
-}
+};
 
 const computerStrategy = {
   placeShips(playerGameboard) {
@@ -66,7 +82,7 @@ const computerStrategy = {
     for (let [y, row] of opponentGameboard.board.entries()) {
       for (let [x, cell] of row.entries()) {
         if (!cell.isAttacked) {
-          notAttackedCells.push([x, y])
+          notAttackedCells.push([x, y]);
         }
       }
     }
@@ -75,13 +91,60 @@ const computerStrategy = {
     if (notAttackedCells.length === 0) {
       throw new Error("No available cells to attack");
     }
-    const positionToAttack = notAttackedCells[getRandomInt(0, notAttackedCells.length - 1)];
+    const positionToAttack =
+      notAttackedCells[getRandomInt(0, notAttackedCells.length - 1)];
 
     // Attack this square
     return opponentGameboard.receiveAttack(positionToAttack);
   },
-}
+};
 
+function validateHumanShipPlacements(selectedPositionMaps) {
+  if (
+    typeof selectedPositionMaps !== "object" ||
+    selectedPositionMaps === null
+  ) {
+    throw new Error("Invalid ship placements input");
+  }
+
+  const expectedTypes = Object.keys(Ship.shipTypes);
+  const providedTypes = Object.keys(selectedPositionMaps);
+
+  // Ensure all required ship types are present
+  for (const type of expectedTypes) {
+    if (!providedTypes.includes(type)) {
+      throw new Error(`Missing ship type: ${type}`);
+    }
+  }
+
+  // Ensure no extra types
+  for (const type of providedTypes) {
+    if (!expectedTypes.includes(type)) {
+      throw new Error(`Unexpected ship type: ${type}`);
+    }
+  }
+
+  for (const [type, positions] of Object.entries(selectedPositionMaps)) {
+    const expectedSize = Ship.shipTypes[type].size;
+
+    // Ensure correct number of positions
+    if (!Array.isArray(positions) || positions.length !== expectedSize) {
+      throw new Error(`Invalid number of positions for ${type}`);
+    }
+
+    // Ensure all positions are valid
+    for (const pos of positions) {
+      if (!Gameboard.isValidPosition(pos)) {
+        throw new Error(`Invalid position for ${type}: [${pos}]`);
+      }
+    }
+
+    // Ensure positions are contiguous and aligned
+    if (!Gameboard.arePositionsContiguous(positions)) {
+      throw new Error(`Positions for ${type} are not contiguous or aligned`);
+    }
+  }
+}
 
 function validateGameboard(gameboard) {
   if (!gameboard) {
@@ -92,7 +155,6 @@ function validateGameboard(gameboard) {
     throw new Error("Gameboard.board must be a 10x10 array");
   }
 }
-
 
 function getRandomInt(minInt, maxInt) {
   if (!Number.isInteger(minInt) || !Number.isInteger(maxInt)) {
