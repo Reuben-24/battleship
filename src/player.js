@@ -1,8 +1,7 @@
 import Gameboard from "./gameboard.js";
 import { computerStrategy, humanStrategy } from "./strategies.js";
-export { Player };
 
-class Player {
+export default class Player {
   constructor(type) {
     if (!(type in Player.types)) {
       throw new Error("Invalid player type provided to Player constructor");
@@ -16,8 +15,8 @@ class Player {
     return this.strategy.placeShips(this.gameboard, selectedPositionsMap);
   }
 
-  takeTurn(opponent) {
-    return this.strategy.takeTurn(opponent.gameboard);
+  takeTurn(opponentPlayer, selectedPosition = undefined) {
+    return this.strategy.takeTurn(opponentPlayer.gameboard, selectedPosition);
   }
 
   static types = {

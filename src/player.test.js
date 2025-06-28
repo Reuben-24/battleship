@@ -1,4 +1,4 @@
-import { Player } from "./player.js";
+import Player from "./player.js";
 import Ship from "./ship.js";
 import { computerStrategy, humanStrategy } from "./strategies.js";
 
@@ -455,5 +455,189 @@ describe("humanPlayer.placeShips", () => {
 
     const placedTypes = new Set(cellsWithShips.map((cell) => cell.ship.type));
     expect(placedTypes).toEqual(new Set(Object.keys(Ship.shipTypes)));
+  });
+});
+
+describe("humanPlayer.takeTurn", () => {
+  let humanPlayer;
+  let computerPlayer;
+
+  beforeEach(() => {
+    humanPlayer = new Player("human");
+  });
+
+  test("throws if opponent is undefined or lacks gameboard", () => {
+    computerPlayer = new Player("computer");
+    computerPlayer.gameboard = null;
+
+    expect(() => {
+      humanPlayer.takeTurn(computerPlayer, [0, 0]);
+    }).toThrow("No gameboard provided");
+  });
+
+  test("throws if invalid position is given", () => {
+    computerPlayer = new Player("computer");
+    const invalidPos = [-1, 2];
+    expect(() => {
+      humanPlayer.takeTurn(computerPlayer, invalidPos);
+    }).toThrow("Invalid selected position");
+
+    const invalidPos1 = [10, 10];
+    expect(() => {
+      humanPlayer.takeTurn(computerPlayer, invalidPos1);
+    }).toThrow("Invalid selected position");
+
+    const invalidPos2 = 20;
+    expect(() => {
+      humanPlayer.takeTurn(computerPlayer, invalidPos2);
+    }).toThrow("Invalid selected position");
+  });
+
+  test("throws if selectedPosition has already been attacked", () => {
+    computerPlayer = new Player("computer");
+    const pos = [9, 9];
+    humanPlayer.takeTurn(computerPlayer, pos);
+
+    expect(() => {
+      humanPlayer.takeTurn(computerPlayer, pos);
+    }).toThrow(
+      "Position given to receiveAttack function has already been attacked",
+    );
+  });
+
+  test("changes position's isAttacked status to true", () => {
+    computerPlayer = new Player("computer");
+    expect(computerPlayer.gameboard.board[9][9].isAttacked).toBe(false);
+
+    const pos = [9, 9];
+    humanPlayer.takeTurn(computerPlayer, pos);
+
+    expect(computerPlayer.gameboard.board[9][9].isAttacked).toBe(true);
+  });
+
+  test("returns 'hit' when ship is present", () => {
+    const humanPlayer1 = new Player("human");
+    const validMap = {
+      carrier: [
+        [0, 0],
+        [0, 1],
+        [0, 2],
+        [0, 3],
+        [0, 4],
+      ],
+      battleship: [
+        [1, 0],
+        [1, 1],
+        [1, 2],
+        [1, 3],
+      ],
+      cruiser: [
+        [2, 0],
+        [2, 1],
+        [2, 2],
+      ],
+      submarine: [
+        [3, 0],
+        [3, 1],
+        [3, 2],
+      ],
+      destroyer: [
+        [4, 0],
+        [4, 1],
+      ],
+    };
+
+    humanPlayer1.placeShips(validMap);
+
+    const pos = [0, 0];
+
+    expect(humanPlayer.takeTurn(humanPlayer1, pos)).toBe("hit");
+  });
+
+  test("returns 'miss' when attacking empty cell", () => {
+    const humanPlayer1 = new Player("human");
+    const validMap = {
+      carrier: [
+        [0, 0],
+        [0, 1],
+        [0, 2],
+        [0, 3],
+        [0, 4],
+      ],
+      battleship: [
+        [1, 0],
+        [1, 1],
+        [1, 2],
+        [1, 3],
+      ],
+      cruiser: [
+        [2, 0],
+        [2, 1],
+        [2, 2],
+      ],
+      submarine: [
+        [3, 0],
+        [3, 1],
+        [3, 2],
+      ],
+      destroyer: [
+        [4, 0],
+        [4, 1],
+      ],
+    };
+
+    humanPlayer1.placeShips(validMap);
+
+    const pos = [9, 9];
+
+    expect(humanPlayer.takeTurn(humanPlayer1, pos)).toBe("miss");
+  });
+
+  test("multiple valid turns update correct cells", () => {
+    const opponent = new Player("human");
+    const validMap = {
+      carrier: [
+        [0, 0],
+        [0, 1],
+        [0, 2],
+        [0, 3],
+        [0, 4],
+      ],
+      battleship: [
+        [1, 0],
+        [1, 1],
+        [1, 2],
+        [1, 3],
+      ],
+      cruiser: [
+        [2, 0],
+        [2, 1],
+        [2, 2],
+      ],
+      submarine: [
+        [3, 0],
+        [3, 1],
+        [3, 2],
+      ],
+      destroyer: [
+        [4, 0],
+        [4, 1],
+      ],
+    };
+    opponent.placeShips(validMap);
+
+    const positions = [
+      [0, 0],
+      [1, 1],
+      [2, 2],
+      [3, 3],
+      [4, 4],
+      [5, 5],
+    ];
+    positions.forEach((pos) => {
+      expect(opponent.gameboard.board[pos[1]][pos[0]].isAttacked).toBe(false);
+      humanPlayer.takeTurn(opponent, pos);
+      expect(opponent.gameboard.board[pos[1]][pos[0]].isAttacked).toBe(true);
+    });
   });
 });
