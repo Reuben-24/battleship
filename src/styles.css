@@ -89,7 +89,7 @@ footer {
   padding-bottom: 2rem;
 }
 
-.output-container {
+#top-content-container {
   padding: 30px;
   display: flex;
   justify-content: center;
@@ -98,7 +98,7 @@ footer {
   width: 100%;
 }
 
-output {
+#start-game-display {
   display: flex;
   align-items: center;
   padding: 15px 25px;
@@ -145,7 +145,7 @@ button:active {
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 }
 
-.content-container {
+#bottom-content-container {
   display: flex;
   gap: 40px;
   justify-content: center;
@@ -154,7 +154,15 @@ button:active {
   flex-wrap: wrap;
 }
 
-.gameboard {
+/* Board Container */
+
+.board-heading {
+  margin-bottom: 10px;
+  text-align: center;
+  color: #4d4d4d;
+}
+
+.board {
   display: grid;
   grid-template-columns: repeat(10, 1fr);
   grid-template-rows: repeat(10, 1fr);
@@ -166,14 +174,20 @@ button:active {
   overflow: hidden;
 }
 
-.gameboard > div {
+.cell {
   border: 1px solid #ccc;
   aspect-ratio: 1 / 1;
   background-color: white;
   transition: background-color 0.2s ease;
 }
 
-.ships-container {
+.cell[data-ship-type] {
+background-color: rgb(65, 65, 65);
+}
+
+/* Ship Container */
+
+#ships-container {
   display: flex;
   flex-direction: column;
   gap: 16px;
@@ -182,6 +196,10 @@ button:active {
   border: 2px solid #ccc;
   border-radius: 12px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+#ships-container-heading {
+  color: #4d4d4d;
 }
 
 .ship-wrapper {
@@ -198,8 +216,7 @@ button:active {
 }
 
 .ship {
-  border: 1px solid black;
-  background-color: black;
+  background-color: rgb(65, 65, 65);
   height: 40px;
 }
 
@@ -227,11 +244,6 @@ button:active {
   cursor: grabbing;
 }
 
-.cell[data-ship-type] {
-  border: 1px solid black;
-  background-color: black;
-}
-
 .ship[data-isPlaced="true"] {
-  display: none;
+  background-color: white;
 }

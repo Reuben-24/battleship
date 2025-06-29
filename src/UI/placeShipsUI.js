@@ -13,7 +13,7 @@ function initDragDrop() {
   });
 
   // Handle drag events over each cell on the gameboard
-  const cells = document.querySelectorAll("#human-board .cell");
+  const cells = document.querySelectorAll("#human-board-container .cell");
 
   cells.forEach((cell) => {
     // Prevent default dragover behaviour to allow drop

@@ -1,10 +1,8 @@
-import "./styles/styles.css";
-import { createBoard, createShipElements } from "./dom.js";
-import { initDragDrop } from "./placeShipsUI";
+import "./styles.css";
+import { renderStartGameUI } from "./UI/dom.js";
+import { initDragDrop } from "./UI/placeShipsUI.js";
 
-const humanBoard = document.getElementById("human-board");
-const shipContainer = document.querySelector(".ships-container");
-
-createBoard(humanBoard);
-createShipElements(shipContainer);
+renderStartGameUI()
 initDragDrop();
+
+
