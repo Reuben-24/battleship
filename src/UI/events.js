@@ -1,9 +1,18 @@
-export {  };
+import { getSelectedPositionsMap } from "./dom.js";
+import { validateHumanShipPlacements } from "../gameLogic/strategies.js";
+export { initStartGameListener };
 
-addStartGameListener() {
-  const startGame = document.getElementById("start-game");
+function initStartGameListener(onStart) {
+  const startGameButton = document.getElementById("start-game-button");
 
-  startGame.addEventListener("click", e => {
+  startGameButton.addEventListener("click", () => {
+    const selectedPositionsMap = getSelectedPositionsMap();
 
+    try {
+      validateHumanShipPlacements(selectedPositionsMap);
+      onStart(selectedPositionsMap);
+    } catch {
+      alert("All ships must be placed on the board");
+    }
   });
 }

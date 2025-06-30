@@ -38,7 +38,7 @@ function createStartGameDisplay(container) {
   // Create display
   const display = document.createElement("div");
   display.id = "start-game-display";
-  display.textContent = "Drag and drop ships into the gameboard and press 'Start Game' when you are ready to begin.";
+  display.textContent = "Drag and drop ships into the gameboard. Click a ship to rotate if there is space. Refresh the page to reset the board. Press 'Start Game' when you are ready to begin.";
 
   // Create button
   const button = document.createElement("button");
@@ -65,7 +65,7 @@ function createBoard(container, headingText, size = 10) {
       cell.dataset.x = x;
       cell.dataset.y = y;
       cell.dataset.occupied = "false";
-      cell.dataset.isAttacked = "false";
+      cell.dataset.attacked = "false";
       board.appendChild(cell);
     }
   }
@@ -105,7 +105,6 @@ function createShipElements(container) {
     ship.setAttribute("data-type", type);
     ship.setAttribute("data-size", size);
     ship.setAttribute("data-orientation", "horizontal");
-    ship.setAttribute("data-isplaced", "false");
     ship.setAttribute("id", type);
     ship.setAttribute("draggable", "true");
 

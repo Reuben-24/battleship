@@ -6,6 +6,7 @@ function initDragDrop() {
 
   ships.forEach((ship) => {
     ship.addEventListener("dragstart", (event) => {
+      if (ship.style.visibility === "hidden") return;
       event.dataTransfer.setData("type", ship.dataset.type);
       event.dataTransfer.setData("size", ship.dataset.size);
       event.dataTransfer.setData("orientation", ship.dataset.orientation);
@@ -32,26 +33,42 @@ function initDragDrop() {
       const startY = parseInt(cell.dataset.y);
       const orientation = e.dataTransfer.getData("orientation");
 
-      // Visually place the ship on the board
-      placeShipOnBoard(type, size, startX, startY, orientation);
-
-      // Visually remove ship from ship container (handled in css)
-      removeShipFromShipContainer(type);
+      // Check if the ship can be placed
+      if (canPlaceShip(size, startX, startY, orientation)) {
+        placeShipOnBoard(type, size, startX, startY, orientation);
+        hideShipInShipContainer(type);
+      } else {
+        console.warn("Cannot place ship: space is occupied or out of bounds.");
+        // Optionally provide user feedback
+      }
     });
   });
 }
 
-function removeShipFromShipContainer(type) {
-  const shipToRemove = document.getElementById(type);
-  shipToRemove.dataset.isplaced = "true";
-  console.log("Removing ship:", type);
-  console.log("Found ship element:", shipToRemove);
+
+function rotationHandlerFactory(type, size, startX, startY, orientation) {
+  return function rotationHandler() {
+    const newOrientation = orientation === "horizontal" ? "vertical" : "horizontal";
+
+    // Temporarily remove the ship before checking new orientation
+    removeShipFromBoard(size, startX, startY, orientation);
+
+    // Check if ship fits with new orientation
+    if (!canPlaceShip(size, startX, startY, newOrientation)) {
+      // If not, re-place it in original orientation
+      placeShipOnBoard(type, size, startX, startY, orientation);
+      return;
+    }
+
+    // Place ship in new orientation
+    placeShipOnBoard(type, size, startX, startY, newOrientation);
+  };
 }
 
-function placeShipOnBoard(type, size, startX, startY, orientation) {
-  // For each cell that the ship will occupy
+
+function removeShipFromBoard(size, startX, startY, orientation) {
   for (let i = 0; i < size; i++) {
-    // Get the coordinates of the cell to display the ship
+    // Get the coordinates of current cell
     const targetX = orientation === "horizontal" ? startX + i : startX;
     const targetY = orientation === "vertical" ? startY + i : startY;
 
@@ -60,11 +77,72 @@ function placeShipOnBoard(type, size, startX, startY, orientation) {
       `.cell[data-x="${targetX}"][data-y="${targetY}"]`,
     );
 
-    // Adjust data value to allow styling
+    // Remove shipType data value (removes styling)
     if (cell) {
-      cell.dataset.shipType = type;
+      cell.removeAttribute("data-ship-type");
     } else {
-      console.error("Invalid drop position");
+      console.warn(`Cell at (${targetX}, ${targetY}) not found.`);
     }
   }
+}
+
+
+function placeShipOnBoard(type, size, startX, startY, orientation) {
+  for (let i = 0; i < size; i++) {
+    // Get the coordinates of current cell
+    const targetX = orientation === "horizontal" ? startX + i : startX;
+    const targetY = orientation === "vertical" ? startY + i : startY;
+
+    // Select this cell
+    const cell = document.querySelector(
+      `.cell[data-x="${targetX}"][data-y="${targetY}"]`,
+    );
+
+    if (cell) {
+      // Remove previous listener if exists
+      if (cell.rotationHandler) {
+        cell.removeEventListener("click", cell.rotationHandler);
+      }
+
+      // Create and add new listener
+      const handler = rotationHandlerFactory(type, size, startX, startY, orientation);
+      cell.addEventListener("click", handler);
+
+      // Store handler ref for future removal
+      cell.rotationHandler = handler;
+
+      cell.setAttribute("data-ship-type", type);
+    }
+  }
+}
+
+
+function hideShipInShipContainer(type) {
+  // Change visibility to hidden to hide in display
+  const shipToRemove = document.getElementById(type);
+  shipToRemove.style.visibility = "hidden";
+}
+
+
+function canPlaceShip(size, startX, startY, orientation) {
+  const boardSize = 10;
+
+  for (let i = 0; i < size; i++) {
+    const targetX = orientation === "horizontal" ? startX + i : startX;
+    const targetY = orientation === "vertical" ? startY + i : startY;
+
+    if (targetX < 0 || targetX >= boardSize || targetY < 0 || targetY >= boardSize) {
+      return false;
+    }
+
+    const cell = document.querySelector(
+      `.cell[data-x="${targetX}"][data-y="${targetY}"]`
+    );
+
+    // Check cell existence and occupancy
+    if (!cell || cell.dataset.shipType) {
+      return false;
+    }
+  }
+  return true;
 }

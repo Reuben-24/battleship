@@ -243,7 +243,3 @@ background-color: rgb(65, 65, 65);
 .ship:active {
   cursor: grabbing;
 }
-
-.ship[data-isPlaced="true"] {
-  background-color: white;
-}

@@ -1,6 +1,6 @@
 import Ship from "./ship.js";
 import Gameboard from "./gameboard.js";
-export { computerStrategy, humanStrategy };
+export { computerStrategy, humanStrategy, validateHumanShipPlacements };
 
 const humanStrategy = {
   placeShips(playerGameboard, selectedPositionsMap) {
