@@ -98,7 +98,7 @@ footer {
   width: 100%;
 }
 
-#start-game-display {
+#top-content-container div {
   display: flex;
   align-items: center;
   padding: 15px 25px;
@@ -113,7 +113,7 @@ footer {
   width: 600px;
 }
 
-button {
+#top-content-container button {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -134,13 +134,13 @@ button {
   font-size: 1.2em;
 }
 
-button:hover {
+#top-content-container button:hover {
   background-color: #27ae60;
   transform: translateY(-2px);
   box-shadow: 0 5px 12px rgba(0, 0, 0, 0.3);
 }
 
-button:active {
+#top-content-container button:active {
   transform: translateY(0);
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 }
@@ -181,7 +181,7 @@ button:active {
   transition: background-color 0.2s ease;
 }
 
-.cell[data-ship-type] {
+.cell[data-ship] {
 background-color: rgb(65, 65, 65);
 }
 

@@ -18,7 +18,7 @@ export default class Gameboard {
   getBoardState() {
     return this.board.map((row) =>
       row.map((cell) => ({
-        hasShip: cell.ship !== null,
+        ship: cell.ship || null,
         isAttacked: cell.isAttacked,
         wasHit: cell.isAttacked && cell.ship !== null,
       })),

@@ -12,6 +12,7 @@ function initStartGameListener(onStart) {
       validateHumanShipPlacements(selectedPositionsMap);
       onStart(selectedPositionsMap);
     } catch {
+      console.log(selectedPositionsMap);
       alert("All ships must be placed on the board");
     }
   });

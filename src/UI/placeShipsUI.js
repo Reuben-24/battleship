@@ -79,7 +79,14 @@ function removeShipFromBoard(size, startX, startY, orientation) {
 
     // Remove shipType data value (removes styling)
     if (cell) {
-      cell.removeAttribute("data-ship-type");
+      // ❗ Remove the click listener if it exists
+      if (cell.rotationHandler) {
+        cell.removeEventListener("click", cell.rotationHandler);
+        delete cell.rotationHandler;
+      }
+
+      // Remove shipType data
+      cell.removeAttribute("data-ship");
     } else {
       console.warn(`Cell at (${targetX}, ${targetY}) not found.`);
     }
@@ -111,7 +118,7 @@ function placeShipOnBoard(type, size, startX, startY, orientation) {
       // Store handler ref for future removal
       cell.rotationHandler = handler;
 
-      cell.setAttribute("data-ship-type", type);
+      cell.dataset.ship = type;
     }
   }
 }
@@ -140,7 +147,7 @@ function canPlaceShip(size, startX, startY, orientation) {
     );
 
     // Check cell existence and occupancy
-    if (!cell || cell.dataset.shipType) {
+    if (!cell || cell.dataset.ship) {
       return false;
     }
   }

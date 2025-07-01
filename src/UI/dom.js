@@ -1,4 +1,4 @@
-export { renderStartGameUI, getSelectedPositionsMap };
+export { renderStartGameUI, getSelectedPositionsMap, renderGameUI };
 
 function getSelectedPositionsMap() {
   const cells = document.querySelectorAll("#human-board-container .cell");
@@ -12,7 +12,7 @@ function getSelectedPositionsMap() {
   };
 
   cells.forEach(cell => {
-    const type = cell.dataset.shipType;
+    const type = cell.dataset.ship;
     if (type in selectedPositionsMap) {
       selectedPositionsMap[type].push([
         parseInt(cell.dataset.x),
@@ -25,14 +25,33 @@ function getSelectedPositionsMap() {
 }
 
 function renderStartGameUI() {
-  const humanBoardContainer = document.getElementById("human-board-container");
-  const shipsContainer = document.getElementById("ships-container");
   const topContentContainer = document.getElementById("top-content-container");
+  const bottomContentContainer = document.getElementById("bottom-content-container");
+
+  // Clear out previous renderings
+  topContentContainer.replaceChildren();
+  bottomContentContainer.replaceChildren();
 
   createStartGameDisplay(topContentContainer);
-  createBoard(humanBoardContainer, "Your Board");
-  createShipElements(shipsContainer);
+  renderBoard(bottomContentContainer, "human", "Your Board");
+  createShipsContainer(bottomContentContainer);
 }
+
+function renderGameUI(humanBoardState, computerBoardState) {
+  const topContentContainer = document.getElementById("top-content-container");
+  const bottomContentContainer = document.getElementById("bottom-content-container");
+
+  // Clear out previous renderings
+  topContentContainer.replaceChildren();
+  bottomContentContainer.replaceChildren();
+
+  // Render computer board
+  renderBoard(bottomContentContainer, "computer", "Opponent Board", computerBoardState);
+
+  // Render human board
+  renderBoard(bottomContentContainer, "human", "Your Board", humanBoardState);
+}
+
 
 function createStartGameDisplay(container) {
   // Create display
@@ -50,27 +69,41 @@ function createStartGameDisplay(container) {
   container.appendChild(button);
 }
 
-function createBoard(container, headingText, size = 10) {
+
+function renderBoard(container, type, headingText, boardState = null, size = 10) {
+  const boardContainer = document.createElement("div");
+  boardContainer.classList.add("board-container");
+  boardContainer.id = `${type}-board-container`;
+
   const board = document.createElement("div");
   board.classList.add("board");
+
   const heading = document.createElement("h2");
   heading.classList.add("board-heading")
   heading.textContent = headingText;
-  container.appendChild(heading);
+  boardContainer.appendChild(heading);
 
   for (let y = 0; y < size; y++) {
     for (let x = 0; x < size; x++) {
+      const cellState = boardState ? boardState[y][x] : {};
+
       const cell = document.createElement("div");
       cell.classList.add("cell");
       cell.dataset.x = x;
       cell.dataset.y = y;
-      cell.dataset.occupied = "false";
-      cell.dataset.attacked = "false";
+      
+      if (cellState.ship) {
+        cell.dataset.ship = cellState.ship.type;
+      }
+      cell.dataset.wasHit = cellState.wasHit ? "true" : "false";
+      cell.dataset.wasMissed = (cellState.isAttacked && !cellState.wasHit) ? "true" : "false";
       board.appendChild(cell);
     }
   }
-  container.appendChild(board);
+  boardContainer.appendChild(board);
+  container.appendChild(boardContainer);
 }
+
 
 const shipTypes = [
   { type: "carrier", size: 5 },
@@ -80,14 +113,16 @@ const shipTypes = [
   { type: "destroyer", size: 2 },
 ];
 
-function createShipElements(container) {
-  // Clear existing content
-  container.innerHTML = "";
+
+
+function createShipsContainer(container) {
+  const shipsContainer = document.createElement("div");
+  shipsContainer.id = "ships-container";
 
   const heading = document.createElement("h2");
   heading.id = "ships-container-heading";
   heading.textContent = "Your Ships";
-  container.appendChild(heading);
+  shipsContainer.appendChild(heading);
 
   shipTypes.forEach(({ type, size }) => {
     // Create wrapper
@@ -111,6 +146,7 @@ function createShipElements(container) {
     // Append to wrapper and container
     wrapper.appendChild(label);
     wrapper.appendChild(ship);
-    container.appendChild(wrapper);
+    shipsContainer.appendChild(wrapper);
+    container.appendChild(shipsContainer);
   });
 }
