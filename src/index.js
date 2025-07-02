@@ -1,17 +1,19 @@
 import "./styles.css";
-import { renderStartGameUI, renderGameUI } from "./UI/dom.js";
+import { renderStartGameUI, renderPlayerTurnUI } from "./UI/dom.js";
 import { initDragDrop } from "./UI/placeShipsUI.js";
-import { initStartGameListener } from "./UI/events.js";
+import { initStartGameListener, addAttackListeners } from "./UI/events.js";
 import Game from "./gameLogic/game.js";
 
 renderStartGameUI();
 initDragDrop();
 initStartGameListener((selectedPositionsMap) => {
   const game = new Game(selectedPositionsMap);
-  renderGameUI(game.humanPlayer.gameboard.getBoardState(), game.computerPlayer.gameboard.getBoardState())
+  renderPlayerTurnUI(game.humanPlayer.gameboard.getBoardState(), game.computerPlayer.gameboard.getBoardState())
+  addAttackListeners(game);
 });
 
-//while (true) {
+
+
   // Players turn first - tell player to click square on opponents gameboard to take their turn
   // Valid square click will trigger
   // Get selectedPosition from UI

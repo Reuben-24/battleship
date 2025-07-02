@@ -1,4 +1,4 @@
-export { renderStartGameUI, getSelectedPositionsMap, renderGameUI };
+export { renderStartGameUI, getSelectedPositionsMap, renderPlayerTurnUI, renderHumanResultUI, renderComputerResultUI, renderGameOverUI };
 
 function getSelectedPositionsMap() {
   const cells = document.querySelectorAll("#human-board-container .cell");
@@ -24,6 +24,101 @@ function getSelectedPositionsMap() {
   return selectedPositionsMap;
 }
 
+function renderGameOverUI(winningPlayer) {
+  const topContentContainer = document.getElementById("top-content-container");
+
+  // Clear out previous renderings
+  topContentContainer.replaceChildren();
+  // Render game over display
+  renderGameOverDisplay(winningPlayer, topContentContainer);
+}
+
+function renderGameOverDisplay(winningPlayer, container) {
+  // Create display
+  const display = document.createElement("div");
+  display.id = "game-over-display";
+
+  if (winningPlayer.type === "human") {
+    display.textContent = "You Win! Click 'Play Again' to start a new game";
+  } else {
+    display.textContent = "You Lose! Click 'Play Again' to start a new game";
+  }
+
+  // Create button
+  const button = document.createElement("button");
+  button.id = "play-again-button";
+  button.textContent = "Play Again";
+
+  // Append to container
+  container.appendChild(display);
+  container.appendChild(button);
+}
+
+
+function renderComputerResultUI(result, humanBoardState, computerBoardState) {
+  const topContentContainer = document.getElementById("top-content-container");
+  const bottomContentContainer = document.getElementById("bottom-content-container");
+
+  // Clear out previous renderings
+  topContentContainer.replaceChildren();
+  bottomContentContainer.replaceChildren();
+
+  // Render result display
+  renderComputerResultDisplay(result, topContentContainer);
+
+  // Re-render boards with new results
+  renderBoard(bottomContentContainer, "computer", "Opponent Board", computerBoardState);
+  renderBoard(bottomContentContainer, "human", "Your Board", humanBoardState);
+}
+
+function renderComputerResultDisplay(result, container) {
+  // Create display
+  const display = document.createElement("div");
+  display.id = "computer-result-display";
+  display.textContent = `Opponent ${result}! Click continue button to continue`
+
+  // Create button
+  const button = document.createElement("button");
+  button.id = "continue-button";
+  button.textContent = "Continue";
+
+  // Append to container
+  container.appendChild(display);
+  container.appendChild(button);
+}
+
+function renderHumanResultUI(result, humanBoardState, computerBoardState) {
+  const topContentContainer = document.getElementById("top-content-container");
+  const bottomContentContainer = document.getElementById("bottom-content-container");
+
+  // Clear out previous renderings
+  topContentContainer.replaceChildren();
+  bottomContentContainer.replaceChildren();
+
+  // Render result display
+  renderHumanResultDisplay(result, topContentContainer);
+
+  // Re-render boards with new results
+  renderBoard(bottomContentContainer, "computer", "Opponent Board", computerBoardState);
+  renderBoard(bottomContentContainer, "human", "Your Board", humanBoardState);
+}
+
+function renderHumanResultDisplay(result, container) {
+  // Create display
+  const display = document.createElement("div");
+  display.id = "human-result-display";
+  display.textContent = `${result.toUpperCase()}! Click continue button to continue`
+
+  // Create button
+  const button = document.createElement("button");
+  button.id = "continue-button";
+  button.textContent = "Continue";
+
+  // Append to container
+  container.appendChild(display);
+  container.appendChild(button);
+}
+
 function renderStartGameUI() {
   const topContentContainer = document.getElementById("top-content-container");
   const bottomContentContainer = document.getElementById("bottom-content-container");
@@ -37,7 +132,7 @@ function renderStartGameUI() {
   createShipsContainer(bottomContentContainer);
 }
 
-function renderGameUI(humanBoardState, computerBoardState) {
+function renderPlayerTurnUI(humanBoardState, computerBoardState) {
   const topContentContainer = document.getElementById("top-content-container");
   const bottomContentContainer = document.getElementById("bottom-content-container");
 
@@ -45,11 +140,33 @@ function renderGameUI(humanBoardState, computerBoardState) {
   topContentContainer.replaceChildren();
   bottomContentContainer.replaceChildren();
 
+  // Render display
+  renderPlayerTurnDisplay(topContentContainer);
+
   // Render computer board
   renderBoard(bottomContentContainer, "computer", "Opponent Board", computerBoardState);
 
   // Render human board
   renderBoard(bottomContentContainer, "human", "Your Board", humanBoardState);
+
+  // Add class to unattacked computer board cells to make them clickable in css
+  const computerBoardCells = document.querySelectorAll("#computer-board-container .cell");
+  computerBoardCells.forEach(cell => {
+    if (cell.dataset.wasHit === "false" && cell.dataset.wasMissed === "false") {
+      cell.classList.add("clickable");
+    }
+  })
+}
+
+
+function renderPlayerTurnDisplay(container) {
+  // Create display
+  const display = document.createElement("div");
+  display.id = "player-turn-display";
+  display.textContent = "Click a square on the opponents board to attack.";
+
+  // Append to container
+  container.appendChild(display);
 }
 
 
@@ -91,12 +208,14 @@ function renderBoard(container, type, headingText, boardState = null, size = 10)
       cell.classList.add("cell");
       cell.dataset.x = x;
       cell.dataset.y = y;
-      
-      if (cellState.ship) {
+    
+      if (cellState.ship && type === "human") {
         cell.dataset.ship = cellState.ship.type;
       }
+
       cell.dataset.wasHit = cellState.wasHit ? "true" : "false";
       cell.dataset.wasMissed = (cellState.isAttacked && !cellState.wasHit) ? "true" : "false";
+
       board.appendChild(cell);
     }
   }

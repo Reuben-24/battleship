@@ -22,6 +22,10 @@ button {
   cursor: pointer;
 }
 
+.clickable {
+  cursor: pointer;
+}
+
 body {
   display: flex;
   flex-direction: column;
@@ -100,6 +104,7 @@ footer {
 
 #top-content-container div {
   display: flex;
+  justify-content: center;
   align-items: center;
   padding: 15px 25px;
   font-size: 1.2em;
@@ -182,7 +187,24 @@ footer {
 }
 
 .cell[data-ship] {
-background-color: rgb(65, 65, 65);
+  background-color: rgb(65, 65, 65);
+}
+
+.cell[data-was-hit="true"] {
+  background-color: green;
+}
+
+.cell[data-was-missed="true"] {
+  background-color: red;
+}
+
+.cell.clickable:hover {
+  background-color: rgb(195, 195, 195);
+  box-shadow: 0 5px 12px rgba(0, 0, 0, 0.3);
+}
+
+.cell.clickable:active {
+  background-color: rgb(149, 149, 149);
 }
 
 /* Ship Container */
@@ -218,6 +240,11 @@ background-color: rgb(65, 65, 65);
 .ship {
   background-color: rgb(65, 65, 65);
   height: 40px;
+  cursor: pointer;
+}
+
+.ship:hover {
+  background-color: rgb(106, 106, 106);
 }
 
 .ship[data-type="carrier"] {
