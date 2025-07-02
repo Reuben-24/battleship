@@ -31,7 +31,7 @@ describe("Gameboard.getBoardState", () => {
     expect(state).toHaveLength(10);
     expect(state[0]).toHaveLength(10);
     expect(state[0][0]).toEqual({
-      hasShip: false,
+      ship: null,
       isAttacked: false,
       wasHit: false,
     });
@@ -41,7 +41,7 @@ describe("Gameboard.getBoardState", () => {
     board.receiveAttack([1, 1]);
     const state = board.getBoardState();
     expect(state[1][1]).toEqual({
-      hasShip: false,
+      ship: null,
       isAttacked: true,
       wasHit: false,
     });
@@ -54,11 +54,11 @@ describe("Gameboard.getBoardState", () => {
     ]);
     board.receiveAttack([2, 2]);
     const state = board.getBoardState();
-    expect(state[2][2]).toEqual({
-      hasShip: true,
-      isAttacked: true,
-      wasHit: true,
-    });
+
+    expect(state[2][2].ship).toBeTruthy();
+    expect(state[2][2].ship.type).toBe("destroyer");
+    expect(state[2][2].isAttacked).toBe(true);
+    expect(state[2][2].wasHit).toBe(true);
   });
 
   test("reflects an unattacked ship cell in board state", () => {
@@ -67,11 +67,11 @@ describe("Gameboard.getBoardState", () => {
       [4, 5],
     ]);
     const state = board.getBoardState();
-    expect(state[4][4]).toEqual({
-      hasShip: true,
-      isAttacked: false,
-      wasHit: false,
-    });
+
+    expect(state[4][4].ship).toBeTruthy();
+    expect(state[4][4].ship.type).toBe("destroyer");
+    expect(state[4][4].isAttacked).toBe(false);
+    expect(state[4][4].wasHit).toBe(false);
   });
 });
 

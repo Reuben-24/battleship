@@ -1,34 +1,47 @@
-import { renderStartGameUI, renderGameOverUI, getSelectedPositionsMap, renderHumanResultUI, renderComputerResultUI, renderPlayerTurnUI } from "./dom.js";
+import {
+  renderStartGameUI,
+  renderGameOverUI,
+  getSelectedPositionsMap,
+  renderHumanResultUI,
+  renderComputerResultUI,
+  renderPlayerTurnUI,
+} from "./dom.js";
 import { validateHumanShipPlacements } from "../gameLogic/strategies.js";
 import { initDragDrop } from "./placeShipsUI.js";
 import Game from "../gameLogic/game.js";
 export { initStartGameListener, addAttackListeners };
 
-function initStartGameListener(onStart) {
+function initStartGameListener() {
   const startGameButton = document.getElementById("start-game-button");
+  startGameButton.addEventListener("click", handleStartGame);
+}
 
-  startGameButton.addEventListener("click", () => {
-    const selectedPositionsMap = getSelectedPositionsMap();
+function handleStartGame() {
+  const selectedPositionsMap = getSelectedPositionsMap();
+  try {
+    validateHumanShipPlacements(selectedPositionsMap);
+  } catch {
+    console.log(selectedPositionsMap);
+    alert("All ships must be placed on the board");
+  }
 
-    try {
-      validateHumanShipPlacements(selectedPositionsMap);
-      onStart(selectedPositionsMap);
-    } catch {
-      console.log(selectedPositionsMap);
-      alert("All ships must be placed on the board");
-    }
-  });
+  const game = new Game(selectedPositionsMap);
+  renderPlayerTurnUI(
+    game.humanPlayer.gameboard.getBoardState(),
+    game.computerPlayer.gameboard.getBoardState(),
+  );
+  addAttackListeners(game);
 }
 
 function addAttackListeners(game) {
-  const cells = document.querySelectorAll("#computer-board-container .cell")
-  cells.forEach(cell => {
+  const cells = document.querySelectorAll("#computer-board-container .cell");
+  cells.forEach((cell) => {
     if (cell.dataset.wasHit === "false" && cell.dataset.wasMissed === "false") {
-      cell.addEventListener("click", event => {
+      cell.addEventListener("click", (event) => {
         handleHumanAttack(event, game);
       });
     }
-  })
+  });
 }
 
 function handleHumanAttack(event, game) {
@@ -40,30 +53,41 @@ function handleHumanAttack(event, game) {
 
   const result = game.playHumanTurn(selectedPosition);
 
-  renderHumanResultUI(result, game.humanPlayer.gameboard.getBoardState(), game.computerPlayer.gameboard.getBoardState());
+  renderHumanResultUI(
+    result,
+    game.humanPlayer.gameboard.getBoardState(),
+    game.computerPlayer.gameboard.getBoardState(),
+  );
 
   addHumanAttackContinueListener(game);
-
 }
 
 function addHumanAttackContinueListener(game) {
   const continueButton = document.getElementById("continue-button");
 
-  continueButton.addEventListener("click", () => {
-    // Check if winner
-    if (game.getWinner()) {
-      renderGameOverUI(game.getWinner());
-      addPlayAgainListener();
-      return;
-    }
-    handleHumanAttackContinue(game);
-  }, { once: true });
+  continueButton.addEventListener(
+    "click",
+    () => {
+      // Check if winner
+      if (game.getWinner()) {
+        renderGameOverUI(game.getWinner());
+        addPlayAgainListener();
+        return;
+      }
+      handleHumanAttackContinue(game);
+    },
+    { once: true },
+  );
 }
 
 function handleHumanAttackContinue(game) {
   const result = game.playComputerTurn();
 
-  renderComputerResultUI(result, game.humanPlayer.gameboard.getBoardState(), game.computerPlayer.gameboard.getBoardState());
+  renderComputerResultUI(
+    result,
+    game.humanPlayer.gameboard.getBoardState(),
+    game.computerPlayer.gameboard.getBoardState(),
+  );
 
   addComputerAttackContinueListener(game);
 }
@@ -71,19 +95,26 @@ function handleHumanAttackContinue(game) {
 function addComputerAttackContinueListener(game) {
   const continueButton = document.getElementById("continue-button");
 
-  continueButton.addEventListener("click", () => {
-    // Check if winner
-    if (game.getWinner()) {
-      renderGameOverUI(game.getWinner());
-      addPlayAgainListener();
-      return;
-    }
-    handleComputerAttackContinue(game);
-  }, { once: true });
+  continueButton.addEventListener(
+    "click",
+    () => {
+      // Check if winner
+      if (game.getWinner()) {
+        renderGameOverUI(game.getWinner());
+        addPlayAgainListener();
+        return;
+      }
+      handleComputerAttackContinue(game);
+    },
+    { once: true },
+  );
 }
 
 function handleComputerAttackContinue(game) {
-  renderPlayerTurnUI(game.humanPlayer.gameboard.getBoardState(), game.computerPlayer.gameboard.getBoardState())
+  renderPlayerTurnUI(
+    game.humanPlayer.gameboard.getBoardState(),
+    game.computerPlayer.gameboard.getBoardState(),
+  );
   addAttackListeners(game);
 }
 
@@ -93,10 +124,6 @@ function addPlayAgainListener() {
   playAgainButton.addEventListener("click", () => {
     renderStartGameUI();
     initDragDrop();
-    initStartGameListener((selectedPositionsMap) => {
-      const game = new Game(selectedPositionsMap);
-      renderPlayerTurnUI(game.humanPlayer.gameboard.getBoardState(), game.computerPlayer.gameboard.getBoardState())
-      addAttackListeners(game);
-    });
-  })
+    initStartGameListener();
+  });
 }

@@ -45,10 +45,10 @@ function initDragDrop() {
   });
 }
 
-
 function rotationHandlerFactory(type, size, startX, startY, orientation) {
   return function rotationHandler() {
-    const newOrientation = orientation === "horizontal" ? "vertical" : "horizontal";
+    const newOrientation =
+      orientation === "horizontal" ? "vertical" : "horizontal";
 
     // Temporarily remove the ship before checking new orientation
     removeShipFromBoard(size, startX, startY, orientation);
@@ -64,7 +64,6 @@ function rotationHandlerFactory(type, size, startX, startY, orientation) {
     placeShipOnBoard(type, size, startX, startY, newOrientation);
   };
 }
-
 
 function removeShipFromBoard(size, startX, startY, orientation) {
   for (let i = 0; i < size; i++) {
@@ -93,7 +92,6 @@ function removeShipFromBoard(size, startX, startY, orientation) {
   }
 }
 
-
 function placeShipOnBoard(type, size, startX, startY, orientation) {
   for (let i = 0; i < size; i++) {
     // Get the coordinates of current cell
@@ -112,7 +110,13 @@ function placeShipOnBoard(type, size, startX, startY, orientation) {
       }
 
       // Create and add new listener
-      const handler = rotationHandlerFactory(type, size, startX, startY, orientation);
+      const handler = rotationHandlerFactory(
+        type,
+        size,
+        startX,
+        startY,
+        orientation,
+      );
       cell.addEventListener("click", handler);
 
       // Store handler ref for future removal
@@ -123,13 +127,11 @@ function placeShipOnBoard(type, size, startX, startY, orientation) {
   }
 }
 
-
 function hideShipInShipContainer(type) {
   // Change visibility to hidden to hide in display
   const shipToRemove = document.getElementById(type);
   shipToRemove.style.visibility = "hidden";
 }
-
 
 function canPlaceShip(size, startX, startY, orientation) {
   const boardSize = 10;
@@ -138,12 +140,17 @@ function canPlaceShip(size, startX, startY, orientation) {
     const targetX = orientation === "horizontal" ? startX + i : startX;
     const targetY = orientation === "vertical" ? startY + i : startY;
 
-    if (targetX < 0 || targetX >= boardSize || targetY < 0 || targetY >= boardSize) {
+    if (
+      targetX < 0 ||
+      targetX >= boardSize ||
+      targetY < 0 ||
+      targetY >= boardSize
+    ) {
       return false;
     }
 
     const cell = document.querySelector(
-      `.cell[data-x="${targetX}"][data-y="${targetY}"]`
+      `.cell[data-x="${targetX}"][data-y="${targetY}"]`,
     );
 
     // Check cell existence and occupancy
