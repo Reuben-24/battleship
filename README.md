@@ -23,11 +23,9 @@
 
 ## 📦 Tech Stack
 
-| Tech         | Purpose                          |
-|--------------|----------------------------------|
-| JavaScript   | Game logic & DOM interaction     |
-| HTML5        | Structure                        |
-| CSS3         | Layout & styling (CSS Grid FTW)  |
+- JavaScript
+- HTML5
+- CSS3
 
 ---
 
