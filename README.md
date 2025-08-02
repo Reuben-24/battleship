@@ -2,8 +2,6 @@
 
 > A modern twist on the classic Battleship board game. Built entirely with JavaScript, HTML, and CSS — no frameworks, no fluff — just pure front-end firepower.
 
-![Battleship Screenshot](./assets/screenshot.png)
-
 ---
 
 ## 🎯 Features
@@ -11,7 +9,6 @@
 - 🧠 **AI Opponent** – Play against a simple, logical bot  
 - 🛠️ **Drag & Drop Ship Placement** – Intuitive and smooth UX  
 - 🔥 **Hit/Miss Effects** – Visual feedback for every move  
-- 📱 **Responsive Design** – Play on desktop or mobile  
 - 🎨 **Custom CSS Grid Board** – Built from scratch  
 - 🧪 **Modular JavaScript** – Organized, testable codebase  
 
@@ -22,8 +19,6 @@
 > Live demo (hosted on Vercel):  
 👉 [https://battleship-top.vercel.app](https://battleship-top.vercel.app)
 
-![Game Preview](https://image.thum.io/get/https://battleship-top.vercel.app)
-
 ---
 
 ## 📦 Tech Stack
@@ -33,7 +28,6 @@
 | JavaScript   | Game logic & DOM interaction     |
 | HTML5        | Structure                        |
 | CSS3         | Layout & styling (CSS Grid FTW)  |
-| Vite         | Super-fast dev server & build    |
 
 ---
 
@@ -52,16 +46,6 @@
 ---
 
 ## 🧠 Behind the Scenes
-
-```js
-// Sample game state logic
-const gameState = {
-  playerBoard: createEmptyBoard(),
-  aiBoard: generateAIBoard(),
-  currentPlayer: "player",
-  gameOver: false
-};
-```
 
 - Ships are placed using JavaScript arrays  
 - Hit detection and sunk status tracked via ship objects  
@@ -92,32 +76,7 @@ npm run dev
 
 ---
 
-## 🙋‍♂️ About the Author
-
-Made with ❤️ by [Reuben Faltiska](https://github.com/Reuben-24)  
-→ Front-end developer with a focus on interactivity and clean UI design.
-
----
-
-## 📁 Project Structure
-
-```
-├── src/
-│   ├── index.html
-│   ├── styles/
-│   │   └── main.css
-│   ├── js/
-│   │   ├── game.js
-│   │   ├── board.js
-│   │   └── ai.js
-├── assets/
-│   └── screenshot.png
-└── README.md
-```
-
----
-
-## 🌊 Future Improvements
+## 🌊 Potential Future Improvements
 
 - 💬 Sound effects for hits/misses  
 - 🤖 Smarter AI (randomness + strategy)  
